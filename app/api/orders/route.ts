@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
   // validasi field wajib
   if (!customerName || !customerPhone || !address || !items.length) {
     return NextResponse.json(
-      { message: "Missing required fields" },
+      { message: "Missing required fields", console: { items: items.length, address: address.length, customername: customerName.length} },
       { status: 400 },
     );
   }
