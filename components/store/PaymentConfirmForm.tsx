@@ -13,8 +13,8 @@ export function PaymentConfirmForm({ orderId }: { orderId: number }) {
     bankName: "",
     accountNumber: "",
     amount: "",
-    transferProof: "",
   });
+  const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,17 +22,21 @@ export function PaymentConfirmForm({ orderId }: { orderId: number }) {
   };
 
   const handleSubmit = async () => {
-    if (
-      !form.bankName ||
-      !form.accountNumber ||
-      !form.amount ||
-      !form.transferProof
-    ) {
+    if (!form.bankName || !form.accountNumber || !form.amount || !file) {
       alert("Semua field wajib diisi!");
       return;
     }
     setLoading(true);
     try {
+      const uploadData = new FormData();
+      uploadData.append("file", file);
+      const uploadRes = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadData,
+      });
+      const url = await uploadRes.json();
+
+      // Kirim konfirmasi
       const res = await fetch(`/api/payment-confirm`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -41,7 +45,7 @@ export function PaymentConfirmForm({ orderId }: { orderId: number }) {
           bankName: form.bankName,
           accountNumber: form.accountNumber,
           amount: Number(form.amount),
-          transferProof: form.transferProof,
+          transferProof: url,
         }),
       });
 
@@ -56,24 +60,48 @@ export function PaymentConfirmForm({ orderId }: { orderId: number }) {
 
   return (
     <div className="space-y-3">
-        <div className="space-y-2">
-            <Label>Nama Bank</Label>
-            <Input name="bankName" value={form.bankName} onChange={handleChange} placeholder="BCA"/>
-        </div>
-        <div className="space-y-2">
-            <Label>No. Rekening Pengirim</Label>
-            <Input name="accountNumber" value={form.accountNumber} onChange={handleChange} placeholder="0987654321"/>
-        </div>  
-        <div className="space-y-2">
-            <Label>Jumlah Transfer</Label>
-            <Input name="amount" value={form.amount} onChange={handleChange} placeholder="248000"/>
-        </div>  
-        <div className="space-y-2">
-            <Label>URL Bukti Transfer</Label>
-            <Input name="transferProof" value={form.transferProof} onChange={handleChange} placeholder="https://..."/>
-        </div>  
+      <div className="space-y-2">
+        <Label>Nama Bank</Label>
+        <Input
+          name="bankName"
+          value={form.bankName}
+          onChange={handleChange}
+          placeholder="BCA"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label>No. Rekening Pengirim</Label>
+        <Input
+          name="accountNumber"
+          value={form.accountNumber}
+          onChange={handleChange}
+          placeholder="0987654321"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label>Jumlah Transfer</Label>
+        <Input
+          name="amount"
+          value={form.amount}
+          onChange={handleChange}
+          placeholder="248000"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label>Bukti Transfer</Label>
+        <Input
+          type="file"
+          accept="image"
+          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+        />
+        {file && (
+          <p className="text-xs text-muted-foreground">{file.name}</p>
+        )}
+      </div>
 
-        <Button onClick={handleSubmit} disabled={loading} className="w-full">{loading ? "Mengirim..." : "Konfirmasi Pembayaran"}</Button>
+      <Button onClick={handleSubmit} disabled={loading} className="w-full">
+        {loading ? "Mengirim..." : "Konfirmasi Pembayaran"}
+      </Button>
     </div>
-  )
+  );
 }
