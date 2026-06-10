@@ -9,14 +9,14 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider = "postgresql"
 }
 
 model Category {
-  id        Int       @id @default(autoincrement())
-  name      String
-  slug      String    @unique
-  products  Product[]
+  id       Int       @id @default(autoincrement())
+  name     String
+  slug     String    @unique
+  products Product[]
 }
 
 model Product {
@@ -28,7 +28,7 @@ model Product {
   description String         @db.Text
   price       Int
   stock       Int
-  weight      Int            // dalam gram
+  weight      Int // dalam gram
   isActive    Boolean        @default(true)
   images      ProductImage[]
   orderItems  OrderItem[]
@@ -55,35 +55,36 @@ model Customer {
 }
 
 model Address {
-  id          Int      @id @default(autoincrement())
-  customerId  Int
-  customer    Customer @relation(fields: [customerId], references: [id])
-  label       String   // "rumah", "kantor", dll
-  address     String   @db.Text
-  cityId      String
-  cityName    String
-  provinceId  String
-  provinceName String
-  postalCode  String
-  orders      Order[]
+  id              Int      @id @default(autoincrement())
+  customerId      Int
+  customer        Customer @relation(fields: [customerId], references: [id])
+  label           String // "rumah", "kantor", dll
+  address         String   @db.Text
+  subdistrictId   String
+  subdistrictName String
+  districtName    String
+  cityName        String
+  provinceName    String
+  postalCode      String
+  orders          Order[]
 }
 
 model Order {
-  id              Int                  @id @default(autoincrement())
-  customerId      Int
-  customer        Customer             @relation(fields: [customerId], references: [id])
-  addressId       Int
-  address         Address              @relation(fields: [addressId], references: [id])
-  courier         String               // "jne", "sicepat", dll
-  courierService  String               // "REG", "YES", dll
-  shippingCost    Int
-  totalPrice      Int
-  status          OrderStatus          @default(PENDING)
-  paymentStatus   PaymentStatus        @default(UNPAID)
-  notes           String?
-  items           OrderItem[]
-  payment         PaymentConfirmation?
-  createdAt       DateTime             @default(now())
+  id             Int                  @id @default(autoincrement())
+  customerId     Int
+  customer       Customer             @relation(fields: [customerId], references: [id])
+  addressId      Int
+  address        Address              @relation(fields: [addressId], references: [id])
+  courier        String // "jne", "sicepat", dll
+  courierService String // "REG", "YES", dll
+  shippingCost   Int
+  totalPrice     Int
+  status         OrderStatus          @default(PENDING)
+  paymentStatus  PaymentStatus        @default(UNPAID)
+  notes          String?
+  items          OrderItem[]
+  payment        PaymentConfirmation?
+  createdAt      DateTime             @default(now())
 }
 
 model OrderItem {
@@ -92,20 +93,20 @@ model OrderItem {
   order       Order   @relation(fields: [orderId], references: [id])
   productId   Int
   product     Product @relation(fields: [productId], references: [id])
-  productName String  // snapshot nama produk
+  productName String // snapshot nama produk
   quantity    Int
-  price       Int     // snapshot harga saat order
+  price       Int // snapshot harga saat order
 }
 
 model PaymentConfirmation {
-  id            Int       @id @default(autoincrement())
-  orderId       Int       @unique
-  order         Order     @relation(fields: [orderId], references: [id])
+  id            Int      @id @default(autoincrement())
+  orderId       Int      @unique
+  order         Order    @relation(fields: [orderId], references: [id])
   bankName      String
   accountNumber String
   amount        Int
-  transferProof String    // URL gambar bukti transfer
-  confirmedAt   DateTime  @default(now())
+  transferProof String // URL gambar bukti transfer
+  confirmedAt   DateTime @default(now())
 }
 
 enum OrderStatus {

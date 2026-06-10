@@ -29,7 +29,7 @@ export async function checkOngkir({ origin, destination, weight }: {
     destination: string;
     weight: number;
 }) {
-    const res = await fetch(`${BASE_URL}/calculate/district/domestic-cost`, {
+    const res = await fetch(`${BASE_URL}/calculate/domestic-cost`, {
         method: "POST", 
         headers: {
             key: KEY,

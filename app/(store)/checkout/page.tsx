@@ -1,5 +1,6 @@
 "use client";
 
+import { SubdistrictSearch } from "@/components/store/SubdistrictsSearch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,7 +9,6 @@ import { formatRupiah } from "@/lib/utils";
 import { Separator } from "@base-ui/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
 interface ShippingOption {
   name: string;
   code: string;
@@ -23,10 +23,10 @@ interface FormData {
   customerPhone: string;
   customerEmail: string;
   address: string;
-  districtId: string;
+  subdistrictId: string;
+  subdistrictName: string;
   districtName: string;
   cityName: string;
-  proviceId: string;
   provinceName: string;
   postalCode: string;
 }
@@ -40,10 +40,10 @@ export default function CheckoutPage() {
     customerPhone: "",
     customerEmail: "",
     address: "",
-    districtId: "",
+    subdistrictId: "",
+    subdistrictName: "",
     districtName: "",
     cityName: "",
-    proviceId: "",
     provinceName: "",
     postalCode: "",
   });
@@ -59,8 +59,8 @@ export default function CheckoutPage() {
   };
 
   const handleCheckOngkir = async () => {
-    if (!form.districtId) {
-      alert("Isi kecamatan dulu");
+    if (!form.subdistrictId) {
+      alert("Isi kelurahan dulu");
       return;
     }
     setLoadingShipping(true);
@@ -70,19 +70,37 @@ export default function CheckoutPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          destination: form.districtId,
+          destination: form.subdistrictId,
           weight: totalWeight(),
         }),
       });
-
       const data = await res.json();
-      console.log(data)
+      console.log(data);
       setShippingOptions(data.data ?? []);
     } catch {
       alert("Gagal mengambil data ongkir");
     } finally {
       setLoadingShipping(false);
     }
+  };
+
+  const handleSubdistrictSelect = (subdistrict: {
+    id: number;
+    label: string;
+    province_name: string;
+    city_name: string;
+    district_name: string;
+    subdistrict_name: string;
+    zip_code: string;
+  }) => {
+    setForm((prev) => ({
+      ...prev,
+      subdistrictId: String(subdistrict.id),
+      districtName: subdistrict.district_name,
+      cityName: subdistrict.city_name,
+      provinceName: subdistrict.province_name,
+      postalCode: subdistrict.zip_code,
+    }));
   };
 
   const handleOrder = async () => {
@@ -100,10 +118,10 @@ export default function CheckoutPage() {
           customerPhone: form.customerPhone,
           customerEmail: form.customerEmail,
           address: form.address,
-          districtId: form.districtId,
+          subdistrictId: form.subdistrictId,
+          subdistrictName: form.districtName,
           districtName: form.districtName,
           cityName: form.cityName,
-          provinceId: form.provinceName,
           provinceName: form.provinceName,
           postalCode: form.postalCode,
           courier: selectedShipping.code,
@@ -119,7 +137,7 @@ export default function CheckoutPage() {
       const order = await res.json();
       clearCart();
       router.push(`/orders/${order.id}`);
-    } catch { 
+    } catch {
       alert("Gagal membuat order");
     } finally {
       setLoadingOrder(false);
@@ -187,13 +205,7 @@ export default function CheckoutPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label>Provinsi</Label>
-              <Input
-                name="provinceName"
-                value={form.provinceName}
-                onChange={handleChange}
-                placeholder="DKI Jakarta"
-              />
+              <SubdistrictSearch onSelect={handleSubdistrictSelect} />
             </div>
             <div className="space-y-2">
               <Label>Kota</Label>
@@ -204,38 +216,13 @@ export default function CheckoutPage() {
                 placeholder="Jakarta Selatan"
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label>Kecamatan</Label>
-                <Input
-                  name="districtName"
-                  value={form.districtName}
-                  onChange={handleChange}
-                  placeholder="Kebayoran Baru"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Kode Pos</Label>
-                <Input
-                  name="postalCode"
-                  value={form.postalCode}
-                  onChange={handleChange}
-                  placeholder="12150"
-                />
-              </div>
-            </div>
             <div className="space-y-2">
-              <Label>
-                ID Kecamatan{" "}
-                <span className="text-muted-foreground text-xs">
-                  (dari RajaOngkir)
-                </span>
-              </Label>
+              <Label>Provinsi</Label>
               <Input
-                name="districtId"
-                value={form.districtId}
+                name="provinceName"
+                value={form.provinceName}
                 onChange={handleChange}
-                placeholder="1376"
+                placeholder="DKI Jakarta"
               />
             </div>
             <Button
@@ -282,28 +269,40 @@ export default function CheckoutPage() {
         {/* Summary */}
         <div className="border rounded-xl p-4 h-fit space-y-3">
           <h2 className="font-semibold">Ringkasan</h2>
-          <Separator/>
+          <Separator />
           {items.map((i) => (
             <div key={i.productId} className="flex justify-between text-sm">
-              <span className="text-muted-foreground">{i.name} x{i.quantity}</span>
+              <span className="text-muted-foreground">
+                {i.name} x{i.quantity}
+              </span>
               <span>{formatRupiah(i.price * i.quantity)}</span>
             </div>
           ))}
-          <Separator/>
+          <Separator />
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Subtotal</span>
             <span>{formatRupiah(totalPrice())}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Ongkir</span>
-            <span>{selectedShipping ? formatRupiah(selectedShipping.cost) : "-"}</span>
+            <span>
+              {selectedShipping ? formatRupiah(selectedShipping.cost) : "-"}
+            </span>
           </div>
-          <Separator/>
+          <Separator />
           <div className="flex justify-between font-semibold">
             <span>Total</span>
-            <span>{formatRupiah(totalPrice() + (selectedShipping?.cost ?? 0))}</span>
+            <span>
+              {formatRupiah(totalPrice() + (selectedShipping?.cost ?? 0))}
+            </span>
           </div>
-          <Button className="w-full" onClick={handleOrder} disabled={!selectedShipping || loadingOrder}>{loadingOrder ? "Memproses..." : "Buat pesanan"}</Button>
+          <Button
+            className="w-full"
+            onClick={handleOrder}
+            disabled={!selectedShipping || loadingOrder}
+          >
+            {loadingOrder ? "Memproses..." : "Buat pesanan"}
+          </Button>
         </div>
       </div>
     </div>

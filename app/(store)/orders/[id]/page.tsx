@@ -84,8 +84,8 @@ export default async function OrderDetailPage({
         </p>
         <p className="text-muted-foreground">{order.address.address}</p>
         <p className="text-muted-foreground">
-          {order.address.cityName}, {order.address.provinceName},{" "}
-          {order.address.postalCode}
+          {order.address.subdistrictName}, {order.address.districtName}, {order.address.cityName},{" "}
+          {order.address.provinceName}, {order.address.postalCode}
         </p>
       </div>
 
