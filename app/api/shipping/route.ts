@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { checkOngkir } from "@/lib/rajaongkir";
 
-const ORIGIN_CITY_ID = "12780";
+const ORIGIN_CITY_ID = "17574";
 
 export async function POST(request: Request) {
     const body = await request.json();
