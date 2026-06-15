@@ -1,7 +1,7 @@
 import { ProductCard } from "@/components/store/ProductCard";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import type { Category } from "@/app/generated/prisma/client";
+import type { Category } from "@/generated/prisma/client";
 
 async function getProducts(categorySlug?: string) {
   return prisma.product.findMany({

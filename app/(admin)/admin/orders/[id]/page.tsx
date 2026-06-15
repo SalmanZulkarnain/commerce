@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import OrderDetailClient from "./OrderDetailClient";
+import OrderDetailClient from "../../../../../components/admin/OrderDetailClient";
 
 export default async function AdminOrderDetailPage({
   params, 

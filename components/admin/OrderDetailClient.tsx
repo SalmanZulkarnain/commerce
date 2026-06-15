@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { formatRupiah } from "@/lib/utils";
-import { OrderStatus, Prisma } from "@/app/generated/prisma/client";
+import { OrderStatus, Prisma } from "@/generated/prisma/client";
 
 type OrderWithRelations = Prisma.OrderGetPayload<{
   include: {

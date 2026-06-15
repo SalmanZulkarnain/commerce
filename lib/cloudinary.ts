@@ -6,7 +6,12 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export async function uploadImage(file: File): Promise<string> {
+export type UploadResult = {
+  url: string;
+  public_id: string;
+};
+
+export async function uploadImage(file: File, folder: "products" | "payments"): Promise<UploadResult> {
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
 
@@ -14,11 +19,14 @@ export async function uploadImage(file: File): Promise<string> {
     cloudinary.uploader
       .upload_stream(
         {
-          folder: "hannan-store/payments",
+          folder: `hannan-store/${folder}`,
         },
         (error, result) => {
           if (error || !result) return reject(error);
-          resolve(result.secure_url);
+          resolve({
+            url: result.secure_url, 
+            public_id: result.public_id
+          });
         },
       )
       .end(buffer);
