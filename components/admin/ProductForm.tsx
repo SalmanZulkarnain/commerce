@@ -3,46 +3,59 @@
 import Link from "next/link";
 import { Category } from "@/generated/prisma/client";
 import {
-  ImagePreview,
   ProductFormState,
+  ProductImageState,
+  ProductWithImages,
 } from "@/app/(admin)/admin/products/types";
 import saveProductAction from "@/app/(admin)/admin/products/actions";
-import { ProductInput } from "@/app/(admin)/admin/products/schema";
 import ImageUpload from "./ImageUpload";
 import { useTransition } from "react";
 import { useActionState, useState } from "react";
 
 type ProductFormProps = {
   categories: Category[];
-  product?: ProductInput & { id?: number };
+  product?: ProductWithImages;
 };
 
 const initialState: ProductFormState = {
   errors: null,
-};
+};  
 
 export default function ProductForm({ categories, product }: ProductFormProps) {
   const [state, formAction] = useActionState(saveProductAction, initialState);
-  const [images, setImages] = useState<ImagePreview[]>([]);
   const [isPending, startTransition] = useTransition();
+  const [images, setImages] = useState<ProductImageState[]>(() => {
+    if (product?.images) {
+      return product.images.map(img => ({
+        type: "existing", 
+        id: img.id,
+        imageUrl: img.imageUrl, 
+        publicId: img.publicId,
+        isPrimary: img.isPrimary 
+      }))
+    }
+    return [];
+  });
+
+  
+  const handleSubmitForm = async (e: React.ChangeEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.currentTarget);
+    const currentImages = images;
+    
+    startTransition(() => {
+      formAction({
+        formData,
+        currentImages,
+      });
+    });
+  }
 
   return (
     <div className="w-full px-8 py-10 font-sans">
       <form
-        onSubmit={async (e) => {
-          e.preventDefault();
-
-          const formData = new FormData(e.currentTarget);
-
-          const files = images.map((img) => img.file);
-
-          startTransition(() => {
-            formAction({
-              formData,
-              files,
-            });
-          });
-        }}
+        onSubmit={handleSubmitForm}
         className="max-w-3xl mx-auto space-y-6"
       >
         {product?.id && <input type="hidden" name="id" value={product.id} />}
@@ -51,10 +64,10 @@ export default function ProductForm({ categories, product }: ProductFormProps) {
         <div className="flex items-center justify-between border-b border-slate-200 pb-4">
           <div>
             <h1 className="text-xl font-bold tracking-tight text-slate-900">
-              {"Add New Product"}
+              {product ? "Edit Product" : "Add New Product"}
             </h1>
             <p className="text-xs text-slate-500 mt-0.5">
-              {"Publish a new item with category and specification mappings."}
+              {product ? "Publish an edited item with category and specification mappings." : "Publish a new item with category and specification mappings."}
             </p>
           </div>
           <div className="flex items-center gap-2">

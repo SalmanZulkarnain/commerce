@@ -24,11 +24,28 @@ export async function uploadImage(file: File, folder: "products" | "payments"): 
         (error, result) => {
           if (error || !result) return reject(error);
           resolve({
-            url: result.secure_url, 
+            url: result.secure_url,
             public_id: result.public_id
           });
         },
       )
       .end(buffer);
   });
+}
+
+export async function deleteImage(publicIds: string[]) {
+  try {
+    const result = await cloudinary.api.delete_resources(publicIds);
+    return {
+      message: "Berhasil menghapus image di cloudinary",
+      success: true,
+      result
+    };
+  } catch (error) {
+    return {
+      message: "Gagal menghapus image",
+      success: false,
+      error
+    };
+  }
 }

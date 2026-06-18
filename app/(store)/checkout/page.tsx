@@ -75,7 +75,6 @@ export default function CheckoutPage() {
         }),
       });
       const data = await res.json();
-      console.log(data);
       setShippingOptions(data.data ?? []);
     } catch {
       alert("Gagal mengambil data ongkir");

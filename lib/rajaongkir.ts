@@ -12,8 +12,6 @@ export async function getCities() {
 
     const data = await res.json();
 
-    console.log(data);
-
     if(!data) {
         return NextResponse.json(
             { error: "data rusak"}, 

@@ -9,6 +9,6 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "File tidak ada"}, {status: 400});
     }
 
-    const url = await uploadImage(file);
+    const url = await uploadImage(file, "payments");
     return NextResponse.json(url)
 }

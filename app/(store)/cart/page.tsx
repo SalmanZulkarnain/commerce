@@ -36,6 +36,7 @@ export default function CartPage() {
                   src={item.imageUrl}
                   alt={item.name}
                   fill
+                  sizes="20"
                   unoptimized
                   className="object-cover"
                 />

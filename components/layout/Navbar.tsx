@@ -12,7 +12,7 @@ export function Navbar() {
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
             <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-                <Link href="/" className="font-bold text-lg">Hannan Store</Link>
+                <Link href="/" className="font-bold text-lg">My Store</Link>
 
                 <Button variant="ghost" size="icon" className="relative">
                     <Link href="/cart">

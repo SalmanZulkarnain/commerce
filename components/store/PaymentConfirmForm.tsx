@@ -33,7 +33,7 @@ export function PaymentConfirmForm({ orderId }: { orderId: number }) {
         method: "POST",
         body: uploadData,
       });
-      const url = await uploadRes.json();
+      const obj = await uploadRes.json();
 
       // Kirim konfirmasi
       const res = await fetch(`/api/payment-confirm`, {
@@ -44,7 +44,7 @@ export function PaymentConfirmForm({ orderId }: { orderId: number }) {
           bankName: form.bankName,
           accountNumber: form.accountNumber,
           amount: Number(form.amount),
-          transferProof: url,
+          transferProof: obj.url,
         }),
       });
 
@@ -90,6 +90,7 @@ export function PaymentConfirmForm({ orderId }: { orderId: number }) {
         <Label>Bukti Transfer</Label>
         <Input
           type="file"
+          name="file"
           accept="image"
           onChange={(e) => setFile(e.target.files?.[0] ?? null)}
         />

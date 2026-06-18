@@ -26,7 +26,7 @@ export default async function HomePage() {
       {/* Hero */}
       <section className="bg-linear-to-br from-primary/10 to-background border-b">
         <div className="max-w-5xl mx-auto px-4 py-20 flex flex-col items-center text-center gap-6">
-          <h1 className="text-4xl font-bold tracking-tight">Hannan Store</h1>
+          <h1 className="text-4xl font-bold tracking-tight">My Store</h1>
           <p className="text-muted-foreground text-lg max-w-md">
             Peralatan olahraga, hobi, dan perlengkapan rumah berkualitas.
             Pengiriman ke seluruh Indonesia.

@@ -2,11 +2,11 @@
 
 import { useRef, ChangeEvent } from "react";
 import Image from "next/image";
-import { ImagePreview } from "@/app/(admin)/admin/products/types";
+import { ProductImageState } from "@/app/(admin)/admin/products/types";
 
 interface Props {
-  images: ImagePreview[];
-  setImages: React.Dispatch<React.SetStateAction<ImagePreview[]>>;
+  images: ProductImageState[];
+  setImages: React.Dispatch<React.SetStateAction<ProductImageState[]>>;
   maxImages?: number;
 }
 
@@ -15,13 +15,13 @@ export default function ImageUpload({ images, setImages, maxImages = 9 }: Props)
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
-
     
     const files = Array.from(e.target.files);
     const availableSlots = maxImages - images.length;
     const selected = files.slice(0, availableSlots);
 
     const newImages = selected.map((file) => ({
+      type: "new" as const,
       id: crypto.randomUUID(),
       file: file,
       previewUrl: URL.createObjectURL(file),
@@ -32,10 +32,10 @@ export default function ImageUpload({ images, setImages, maxImages = 9 }: Props)
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const removeImage = (id: string) => {
+  const removeImage = (id: string | number) => {
     setImages((prev) => {
       const img = prev.find(i => i.id === id);
-      if (img) URL.revokeObjectURL(img.previewUrl);
+      if (img && img.type === "new") URL.revokeObjectURL(img.previewUrl);
       return prev.filter(i => i.id !== id)
     });
   };
@@ -46,9 +46,10 @@ export default function ImageUpload({ images, setImages, maxImages = 9 }: Props)
         {images.map((img, i) => (
           <div key={img.id} className="relative aspect-square">
             <Image
-              src={img.previewUrl}
+              src={img.type === "new" ? img.previewUrl : img.imageUrl}
               alt="product"
               fill
+              sizes="20"
               className="object-cover rounded"
             />
 
@@ -85,7 +86,7 @@ export default function ImageUpload({ images, setImages, maxImages = 9 }: Props)
         multiple
         accept="image/*"
         onChange={handleFileChange}
-        className="hidden"
+        className="hidden"  
       />
     </div>
   );

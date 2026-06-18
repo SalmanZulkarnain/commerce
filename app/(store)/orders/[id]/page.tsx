@@ -98,7 +98,7 @@ export default async function OrderDetailPage({
           <div className="bg-muted rounded-lg p-4 text-sm space-y-1">
             <p>Transfer ke rekening berikut:</p>
             <p className="font-medium">BCA - 12345678</p>
-            <p className="font-medium">a.n. Hannan Store</p>
+            <p className="font-medium">a.n. My Store</p>
             <p className="text-muted-foreground">
               Total transfer:{" "}
               <span className="font-semibold text-foreground">

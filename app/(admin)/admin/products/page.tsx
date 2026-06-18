@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/table";
 import { formatRupiah } from "@/lib/utils";
 import Image from "next/image";
+import { deleteProductAction } from "./actions";
 
 export default async function AdminListProductPage() {
   // Ambil data produk terbaru dari database
@@ -141,12 +142,19 @@ export default async function AdminListProductPage() {
                       {/* Tombol Aksi */}
                       <TableCell className="py-4.5 text-right pr-6">
                         <Link
-                          href={`/admin/products/edit/${prod.id}`}
+                          href={`/admin/products/${prod.id}/edit`}
                           className="text-xs font-semibold text-slate-600 hover:text-blue-600 border border-slate-200 bg-white shadow-2xs px-3 py-1.5 rounded-lg transition-colors"
                         >
                           Edit
                         </Link>
+                        <form
+                          action={deleteProductAction}
+                          >
+                          <input type="hidden" value={prod.id} name="id"/>
+                          <button type="submit" className="text-xs font-semibold text-slate-600 hover:text-blue-600 border border-slate-200 bg-white shadow-2xs px-3 py-1.5 rounded-lg transition-colors">Remove</button>
+                        </form>
                       </TableCell>
+                      
                     </TableRow>
                   );
                 })

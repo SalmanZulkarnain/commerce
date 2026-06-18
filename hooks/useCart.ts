@@ -63,7 +63,7 @@ export const useCart = create<CartStore>()(
         get().items.reduce((acc, i) => acc + i.weight * i.quantity, 0),
     }),
     {
-      name: "hannan-cart",
+      name: "my-cart",
     },
   ),
 );

@@ -36,7 +36,7 @@ export async function POST(request: Request) {
         bankName,
         accountNumber,
         amount,
-        transferProof,
+        transferProof
       },
     });
 
