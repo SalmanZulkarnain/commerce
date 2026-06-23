@@ -1,10 +1,12 @@
 import { Navbar } from "@/components/layout/Navbar";
+import { auth } from "@/lib/auth";
 
-export default function StoreLayout({
+export default async function StoreLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth();
   return (
     <>
       <Navbar />

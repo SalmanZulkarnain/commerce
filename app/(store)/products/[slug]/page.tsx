@@ -1,5 +1,6 @@
 import { AddToCartButton } from "@/components/store/AddToCartButton";
 import { Badge } from "@/components/ui/badge";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatRupiah } from "@/lib/utils";
 import { Separator } from "@base-ui/react";
@@ -23,6 +24,10 @@ export default async function ProductDetailPage({
 }) {
   const { slug } = await params;
   const product = await getProduct(slug);
+  const session = await auth();
+  if (session) {
+
+  }
 
   if (!product) notFound();
 
@@ -38,6 +43,7 @@ export default async function ProductDetailPage({
         <div className="relative aspect-square rounded-xl overflow-hidden bg-muted">
           <Image
             unoptimized
+            loading="eager"
             src={primaryImage}
             alt={product.name}
             fill
@@ -81,6 +87,7 @@ export default async function ProductDetailPage({
             price={product.price}
             productId={product.id}
             weight={product.weight}
+            isLoggedIn={!!session}
           />
         </div>
       </div>

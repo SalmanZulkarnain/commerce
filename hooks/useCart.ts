@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface CartItem {
-  productId: number;
+export interface CartItem {
+  productId: string;
   name: string;
   price: number;
   weight: number;
@@ -13,10 +13,10 @@ interface CartItem {
 interface CartStore {
   items: CartItem[];
   addItem: (item: Omit<CartItem, "quantity">) => void;
-  removeItem: (productId: number) => void;
-  updateQuantity: (productId: number, quantity: number) => void;
+  removeItem: (productId: string) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
-  totalPrice: () => number;
+  calculateTotalPrice: () => number;
   totalWeight: () => number;
 }
 
@@ -45,19 +45,24 @@ export const useCart = create<CartStore>()(
       },
       removeItem: (productId) => {
         set((state) => ({
-          items: state.items.filter((i) => i.productId !== productId),
+          items: state.items.filter((i) => i.productId !== productId.toString()),
         }));
       },
       updateQuantity: (productId, quantity) => {
         if (quantity < 1) return;
         set((state) => ({
           items: state.items.map((i) =>
-            i.productId === productId ? { ...i, quantity } : i,
+            i.productId === productId.toString() ? { ...i, quantity } : i,
           ),
         }));
       },
-      clearCart: () => set({ items: [] }),
-      totalPrice: () =>
+      clearCart: () => {
+        set({ items: [] });
+        if (typeof window !== undefined) {
+          localStorage.removeItem("my-cart")
+        }
+      },
+      calculateTotalPrice: () =>
         get().items.reduce((acc, i) => acc + i.price * i.quantity, 0),
       totalWeight: () =>
         get().items.reduce((acc, i) => acc + i.weight * i.quantity, 0),

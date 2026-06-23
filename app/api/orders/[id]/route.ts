@@ -1,20 +1,24 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(request: Request, { params }: { params: Promise<{ id: string }>}) {
+interface Props {
+    params: Promise<{ id: string }>
+}
+
+export async function GET(request: Request, { params }: Props) {
     const { id } = await params;
 
     const order = await prisma.order.findUnique({
-        where: { id: Number(id) },
+        where: { id },
         include: {
-            customer: true, 
+            customer: true,
             address: true,
             items: {
                 include: {
                     product: {
                         include: {
                             images: {
-                                where: { isPrimary: true},
+                                where: { isPrimary: true },
                                 take: 1
                             }
                         }
@@ -25,7 +29,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         }
     })
 
-    if(!order) {
+    if (!order) {
         return NextResponse.json({
             error: "Order tidak ditemukan"
         }, { status: 404 })

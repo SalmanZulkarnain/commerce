@@ -9,7 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, totalPrice } = useCart();
+  const { items, removeItem, updateQuantity, calculateTotalPrice } = useCart();
 
   if (items.length === 0) {
     return (
@@ -67,7 +67,7 @@ export default function CartPage() {
             <Separator/>
             <div className="flex justify-between">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span className="font-medium">{formatRupiah(totalPrice())}</span>
+                <span className="font-medium">{formatRupiah(calculateTotalPrice())}</span>
             </div>
             <div className="flex justify-between">
                 <span className="text-muted-foreground">Ongkir</span>

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/store/ProductCard";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth";
+import { HomePageClient } from "./HomePageClient";
 
 async function getFeaturedProducts() {
   return prisma.product.findMany({
@@ -20,6 +22,10 @@ async function getFeaturedProducts() {
 
 export default async function HomePage() {
   const products = await getFeaturedProducts();
+  const session = await auth();
+  // Log for debugging (only shows in terminal)
+  console.log("🔐 Server Session:", session ? "Authenticated" : "Unauthenticated");
+  console.log("👤 User:", session?.user?.name || "No user");
 
   return (
     <>
@@ -63,6 +69,7 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+      <HomePageClient initialSession={session} />
     </>
   );
 }

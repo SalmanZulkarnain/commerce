@@ -5,109 +5,19 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../app/generated/prisma"
+  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
 }
 
-model Category {
-  id       Int       @id @default(autoincrement())
-  name     String
-  slug     String    @unique
-  products Product[]
-}
-
-model Product {
-  id          Int            @id @default(autoincrement())
-  categoryId  Int
-  category    Category       @relation(fields: [categoryId], references: [id])
-  name        String
-  slug        String         @unique
-  description String         @db.Text
-  price       Int
-  stock       Int
-  weight      Int // dalam gram
-  isActive    Boolean        @default(true)
-  images      ProductImage[]
-  orderItems  OrderItem[]
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-}
-
-model ProductImage {
-  id        Int     @id @default(autoincrement())
-  productId Int
-  product   Product @relation(fields: [productId], references: [id])
-  imageUrl  String
-  publicId  String
-  isPrimary Boolean @default(false)
-}
-
-model Customer {
-  id        Int       @id @default(autoincrement())
-  name      String
-  email     String?
-  phone     String
-  addresses Address[]
-  orders    Order[]
-  createdAt DateTime  @default(now())
-}
-
-model Address {
-  id              Int      @id @default(autoincrement())
-  customerId      Int
-  customer        Customer @relation(fields: [customerId], references: [id])
-  label           String // "rumah", "kantor", dll
-  address         String   @db.Text
-  subdistrictId   String
-  subdistrictName String
-  districtName    String
-  cityName        String
-  provinceName    String
-  postalCode      String
-  orders          Order[]
-}
-
-model Order {
-  id             Int                  @id @default(autoincrement())
-  customerId     Int
-  customer       Customer             @relation(fields: [customerId], references: [id])
-  addressId      Int
-  address        Address              @relation(fields: [addressId], references: [id])
-  courier        String // "jne", "sicepat", dll
-  courierService String // "REG", "YES", dll
-  shippingCost   Int
-  totalPrice     Int
-  status         OrderStatus          @default(PENDING)
-  paymentStatus  PaymentStatus        @default(UNPAID)
-  notes          String?
-  items          OrderItem[]
-  payment        PaymentConfirmation?
-  createdAt      DateTime             @default(now())
-}
-
-model OrderItem {
-  id          Int     @id @default(autoincrement())
-  orderId     Int
-  order       Order   @relation(fields: [orderId], references: [id])
-  productId   Int
-  product     Product @relation(fields: [productId], references: [id])
-  productName String // snapshot nama produk
-  quantity    Int
-  price       Int // snapshot harga saat order
-}
-
-model PaymentConfirmation {
-  id            Int      @id @default(autoincrement())
-  orderId       Int      @unique
-  order         Order    @relation(fields: [orderId], references: [id])
-  bankName      String
-  accountNumber String
-  amount        Int
-  transferProof String // URL gambar bukti transfer
-  confirmedAt   DateTime @default(now())
+// ==========================================
+// ENUMS
+// ==========================================
+enum Role {
+  CUSTOMER
+  ADMIN
 }
 
 enum OrderStatus {
@@ -121,4 +31,179 @@ enum OrderStatus {
 enum PaymentStatus {
   UNPAID
   PAID
+}
+
+// ==========================================
+// AUTH & USER MODELS (NextAuth)
+// ==========================================
+model User {
+  id            String          @id @default(cuid())
+  name          String?
+  email         String          @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  role          Role            @default(CUSTOMER)
+  accounts      Account[]
+  sessions      Session[]
+  authenticators Authenticator[]
+  addresses     Address[]
+  orders        Order[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+model Authenticator {
+  credentialID         String  @unique
+  userId               String
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, credentialID])
+}
+
+// ==========================================
+// STORE MODELS
+// ==========================================
+model Category {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id          String         @id @default(cuid())
+  categoryId  String
+  category    Category       @relation(fields: [categoryId], references: [id])
+  name        String
+  slug        String         @unique
+  description String         @db.Text
+  price       Int
+  stock       Int
+  weight      Int            // dalam gram
+  isActive    Boolean        @default(true)
+  images      ProductImage[]
+  orderItems  OrderItem[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  imageUrl  String
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Address {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  label           String   // "rumah", "kantor", dll
+  address         String   @db.Text
+  biteshipAreaId  String   // Baru dari migrasi
+  subdistrictName String
+  districtName    String
+  cityName        String
+  provinceName    String
+  postalCode      String
+  orders          Order[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+  
+model Order {
+  id              String               @id @default(cuid())
+  userId          String
+  user            User                 @relation(fields: [userId], references: [id])
+  addressId       String
+  address         Address              @relation(fields: [addressId], references: [id])
+  courier         String               // "jne", "sicepat", dll
+  courierService  String               // "REG", "YES", dll
+  shippingCost    Int
+  totalPrice      Int
+  status          OrderStatus          @default(PENDING)
+  paymentStatus   PaymentStatus        @default(UNPAID)
+  notes           String?
+  biteshipOrderId String?              // Baru dari migrasi
+  trackingHistory Json?                // Baru dari migrasi (JSONB)
+  waybillNumber   String?              // Baru dari migrasi
+  items           OrderItem[]
+  payment         PaymentConfirmation?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+}
+
+model OrderItem {
+  id          String   @id @default(cuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id])
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  productName String   // snapshot nama produk
+  quantity    Int
+  price       Int      // snapshot harga saat order
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PaymentConfirmation {
+  id            String   @id @default(cuid())
+  orderId       String   @unique
+  order         Order    @relation(fields: [orderId], references: [id])
+  bankName      String
+  accountNumber String
+  amount        Int
+  transferProof String   // URL gambar bukti transfer
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
