@@ -1,10 +1,12 @@
 "use client";
 
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const { data } = useSession();
 
   const menuItems = [
     { name: "Dashboard", href: "/admin/dashboard" },
@@ -54,8 +56,8 @@ export default function AdminSidebar() {
           A
         </div>
         <div>
-          <p className="text-xs font-semibold text-slate-800">Admin Mn</p>
-          <p className="text-[10px] text-slate-400">Store Manager</p>
+          <p className="text-xs font-semibold text-slate-800">{data?.user.name}</p>
+          <p className="text-[10px] text-slate-400">{data?.user.role}</p>
         </div>
       </div>
     </aside>

@@ -10,11 +10,17 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { formatRupiah } from "@/lib/utils";
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 export default async function AdminListOrderPage() {
+  const session = await auth();
+  if (session?.user.role !== "ADMIN") {
+    redirect("/")
+  }
+  
   const orders = await prisma.order.findMany({
     include: {
-      customer: true,
       payment: true,
     },
     orderBy: {

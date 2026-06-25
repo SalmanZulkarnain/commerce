@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/store/ProductCard";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { HomePageClient } from "./HomePageClient";
 
 async function getFeaturedProducts() {
   return prisma.product.findMany({
@@ -69,7 +68,6 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
-      <HomePageClient initialSession={session} />
     </>
   );
 }

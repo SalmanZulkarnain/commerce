@@ -10,8 +10,8 @@ export default async function AdminOrderDetailPage({
 
   const { id } = await params;
   const order = await prisma.order.findUnique({
-    where: { id: Number(id) },
-    include: { customer: true, items: true, address: true, payment: true },
+    where: { id },
+    include: { items: true, address: true, payment: true },
   });
 
   if (!order) notFound();

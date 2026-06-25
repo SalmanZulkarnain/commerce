@@ -37,20 +37,20 @@ enum PaymentStatus {
 // AUTH & USER MODELS (NextAuth)
 // ==========================================
 model User {
-  id            String          @id @default(cuid())
-  name          String?
-  email         String          @unique
-  emailVerified DateTime?
-  password      String?
-  image         String?
-  role          Role            @default(CUSTOMER)
-  accounts      Account[]
-  sessions      Session[]
+  id             String          @id @default(cuid())
+  name           String?
+  email          String          @unique
+  emailVerified  DateTime?
+  password       String?
+  image          String?
+  role           Role            @default(CUSTOMER)
+  accounts       Account[]
+  sessions       Session[]
   authenticators Authenticator[]
-  addresses     Address[]
-  orders        Order[]
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  addresses      Address[]
+  orders         Order[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 }
 
 model Account {
@@ -58,12 +58,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?  @db.Text
   session_state     String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -126,7 +126,10 @@ model Product {
   description String         @db.Text
   price       Int
   stock       Int
-  weight      Int            // dalam gram
+  weight      Int
+  height      Int
+  length      Int
+  width       Int
   isActive    Boolean        @default(true)
   images      ProductImage[]
   orderItems  OrderItem[]
@@ -139,6 +142,7 @@ model ProductImage {
   productId String
   product   Product  @relation(fields: [productId], references: [id])
   imageUrl  String
+  publicId  String
   isPrimary Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -148,35 +152,41 @@ model Address {
   id              String   @id @default(cuid())
   userId          String
   user            User     @relation(fields: [userId], references: [id])
-  label           String   // "rumah", "kantor", dll
+  recepientName   String
+  recepientPhone  String
+  label           String
   address         String   @db.Text
-  biteshipAreaId  String   // Baru dari migrasi
+  biteshipAreaId  String
   subdistrictName String
   districtName    String
   cityName        String
   provinceName    String
+  isPrimary       Boolean
   postalCode      String
   orders          Order[]
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
-  
+
 model Order {
   id              String               @id @default(cuid())
   userId          String
   user            User                 @relation(fields: [userId], references: [id])
   addressId       String
   address         Address              @relation(fields: [addressId], references: [id])
-  courier         String               // "jne", "sicepat", dll
-  courierService  String               // "REG", "YES", dll
+  shippingAddress String
+  recepientName   String
+  recepientPhone  String
+  courier         String // "jne", "sicepat", dll
+  courierService  String // "REG", "YES", dll
   shippingCost    Int
   totalPrice      Int
   status          OrderStatus          @default(PENDING)
   paymentStatus   PaymentStatus        @default(UNPAID)
   notes           String?
-  biteshipOrderId String?              // Baru dari migrasi
-  trackingHistory Json?                // Baru dari migrasi (JSONB)
-  waybillNumber   String?              // Baru dari migrasi
+  biteshipOrderId String?
+  trackingHistory Json?
+  waybillNumber   String?
   items           OrderItem[]
   payment         PaymentConfirmation?
   createdAt       DateTime             @default(now())
@@ -184,16 +194,16 @@ model Order {
 }
 
 model OrderItem {
-  id          String   @id @default(cuid())
-  orderId     String
-  order       Order    @relation(fields: [orderId], references: [id])
-  productId   String
-  product     Product  @relation(fields: [productId], references: [id])
-  productName String   // snapshot nama produk
-  quantity    Int
-  price       Int      // snapshot harga saat order
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String   @id @default(cuid())
+  orderId         String
+  order           Order    @relation(fields: [orderId], references: [id])
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id])
+  productName     String
+  quantity        Int
+  priceAtPurchase Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model PaymentConfirmation {
@@ -203,7 +213,7 @@ model PaymentConfirmation {
   bankName      String
   accountNumber String
   amount        Int
-  transferProof String   // URL gambar bukti transfer
+  transferProof String // URL gambar bukti transfer
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }

@@ -31,6 +31,9 @@ async function main() {
       price: 850000,
       stock: 25,
       weight: 950,
+      width: 35,
+      height: 4,
+      length: 14,
       isActive: true,
       images: {
         create: [
@@ -58,6 +61,9 @@ async function main() {
       price: 450000,
       stock: 40,
       weight: 150,
+      width: 6,
+      height: 3,
+      length: 6,
       isActive: true,
       images: {
         create: [
@@ -81,6 +87,9 @@ async function main() {
       price: 299000,
       stock: 50,
       weight: 600,
+      width: 30,
+      height: 5,
+      length: 35,
       isActive: true,
       images: {
         create: [
@@ -103,6 +112,9 @@ async function main() {
       price: 120000,
       stock: 15,
       weight: 350,
+      width: 12,
+      height: 10,
+      length: 28,
       isActive: true,
       images: {
         create: [
@@ -126,6 +138,9 @@ async function main() {
       price: 135000,
       stock: 100,
       weight: 400,
+      width: 7,
+      height: 23,
+      length: 7,
       isActive: true,
       images: {
         create: [
@@ -136,6 +151,40 @@ async function main() {
           }
         ]
       }
+    }
+  });
+
+  await prisma.address.create({
+    data: {
+      userId: "cmqt7gnxu0000vmekzxhkbxh9",
+      recepientName: "Saul",
+      recepientPhone: "082378395553",
+      label: "Kantor", 
+      address: "Jl. Kenanga Bunga Indah No 23B", 
+      biteshipAreaId: "IDNP6IDNC148IDND843IDZ12250", 
+      subdistrictName: "Pesanggrahan", 
+      districtName: "Pesanggrahan", 
+      cityName: "Jakarta Selatan", 
+      provinceName: "DKI Jakarta", 
+      postalCode: "12250",
+      isPrimary: true
+    }
+  });
+
+  await prisma.address.create({
+    data: {
+      userId: "cmqt7gnxu0000vmekzxhkbxh9",
+      recepientName: "Santoso",
+      recepientPhone: "082438290523",
+      label: "Rumah", 
+      address: "Jl. Mawar Wangi No. 10", 
+      biteshipAreaId: "IDNP6IDNC148IDND836IDZ12410", 
+      subdistrictName: "Cilandak", 
+      districtName: "Cilandak", 
+      cityName: "Jakarta Selatan", 
+      provinceName: "DKI Jakarta", 
+      postalCode: "12410",
+      isPrimary: false
     }
   });
 

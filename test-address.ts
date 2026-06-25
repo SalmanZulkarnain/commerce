@@ -35,4 +35,4 @@ async function checkUserAddresses() {
 }
 
 // createAddressByUser();
-checkUserAddresses();
+// checkUserAddresses();

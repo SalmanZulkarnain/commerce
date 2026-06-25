@@ -9,6 +9,7 @@ export interface Subdistrict {
 }
 
 export interface CheckoutFormValues {
+    label: string
     customerName: string;
     customerPhone: string;
     customerEmail?: string;

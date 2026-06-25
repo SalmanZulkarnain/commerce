@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatRupiah } from "@/lib/utils";
 
 interface Props {
-    id: number; 
+    id: string; 
     name: string;
     slug: string;
     price: number; 

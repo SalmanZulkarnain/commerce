@@ -8,7 +8,7 @@ export type ProductFormState = {
 
 export type ExistingImage = {
   type: "existing",
-  id: number,
+  id: string,
   imageUrl: string,
   publicId: string,
   isPrimary: boolean
